@@ -1,0 +1,44 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#f7f8fc">
+  <title>{% block title %}Taskflow AI{% endblock %} · Taskflow</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Manrope:wght@500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+  {% block head %}{% endblock %}
+</head>
+<body class="{% if session.get('user_id') %}app-body{% else %}public-body{% endif %}">
+{% if session.get('user_id') %}
+<aside class="sidebar" id="sidebar">
+  <a class="brand" href="{{ url_for('main.dashboard') }}"><span class="brand-mark">✳</span><span>taskflow<span class="brand-ai">.ai</span></span></a>
+  <div class="workspace-label">WORKSPACE</div>
+  <nav class="side-nav">
+    <a class="{% if request.endpoint == 'main.dashboard' %}active{% endif %}" href="{{ url_for('main.dashboard') }}"><span>◫</span> Overview</a>
+    <a class="{% if request.endpoint in ['main.boards','main.board_detail'] %}active{% endif %}" href="{{ url_for('main.boards') }}"><span>▤</span> My boards</a>
+    <a class="{% if request.endpoint == 'main.analytics' %}active{% endif %}" href="{{ url_for('main.analytics') }}"><span>⌁</span> Analytics</a>
+  </nav>
+  <div class="sidebar-bottom">
+    <a class="side-profile" href="{{ url_for('main.profile') }}"><span class="avatar">{{ (session.get('user_name','U')[:1] or 'U')|upper }}</span><span class="profile-label"><b>{{ session.get('user_name','Your account') }}</b><small>Personal workspace</small></span><span class="dots">···</span></a>
+    <form action="{{ url_for('main.logout') }}" method="post"><button class="logout-link" type="submit">↪ &nbsp; Sign out</button></form>
+  </div>
+</aside>
+<main class="main-area">
+  <header class="topbar"><button id="menu-toggle" class="menu-toggle" aria-label="Toggle menu">☰</button><div class="breadcrumb">Workspace <span>/</span> {% block breadcrumb %}Overview{% endblock %}</div><div class="topbar-right"><span class="today-label">{{ now_label }}</span><span class="avatar small-avatar">{{ (session.get('user_name','U')[:1] or 'U')|upper }}</span></div></header>
+  <section class="page-content">
+    {% with messages = get_flashed_messages(with_categories=true) %}{% if messages %}<div class="flash-stack">{% for category,message in messages %}<div class="flash {{ category }}">{{ message }}<button type="button" aria-label="Dismiss" onclick="this.parentElement.remove()">×</button></div>{% endfor %}</div>{% endif %}{% endwith %}
+    {% block content %}{% endblock %}
+  </section>
+</main>
+{% else %}
+<header class="public-nav"><a class="brand" href="{{ url_for('main.index') }}"><span class="brand-mark">✳</span><span>taskflow<span class="brand-ai">.ai</span></span></a><nav><a href="{{ url_for('main.login') }}">Log in</a><a class="button button-primary button-small" href="{{ url_for('main.register') }}">Get started <span>→</span></a></nav></header>
+{% with messages = get_flashed_messages(with_categories=true) %}{% if messages %}<div class="public-flashes">{% for category,message in messages %}<div class="flash {{ category }}">{{ message }}</div>{% endfor %}</div>{% endif %}{% endwith %}
+{% block public_content %}{% endblock %}
+{% endif %}
+<script src="{{ url_for('static', filename='js/main.js') }}"></script>
+{% block scripts %}{% endblock %}
+</body>
+</html>

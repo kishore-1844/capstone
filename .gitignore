@@ -1,0 +1,10 @@
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+instance/*.db
+instance/*.db-*
+ai_models/saved_models/*
+!ai_models/saved_models/.gitkeep
+.env
+.pytest_cache/
